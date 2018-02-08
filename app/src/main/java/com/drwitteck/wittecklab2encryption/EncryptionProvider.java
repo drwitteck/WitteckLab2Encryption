@@ -5,7 +5,19 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 public class EncryptionProvider extends ContentProvider {
+    KeyPairGenerator keyPairGenerator;
+    KeyPair keyPair;
+    PublicKey publicKey;
+    PrivateKey privateKey;
+    String encrypted, decrypted;
+
     public EncryptionProvider() {
     }
 
@@ -47,4 +59,13 @@ public class EncryptionProvider extends ContentProvider {
         // TODO: Implement this to handle requests to update one or more rows.
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+    public void generateKeyPair() throws NoSuchAlgorithmException{
+        keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048);
+        keyPair = keyPairGenerator.generateKeyPair();
+        publicKey = keyPair.getPublic();
+        privateKey = keyPair.getPrivate();
+    }
+
 }
