@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">WitteckLab2Encryption</string>
+    <string name="enter_text">Enter text</string>
+    <string name="decrypt">Decrypt</string>
+    <string name="encrypt">Encrypt</string>
+</resources>
