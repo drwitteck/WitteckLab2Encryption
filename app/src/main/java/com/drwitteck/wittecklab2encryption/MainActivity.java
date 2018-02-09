@@ -7,10 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     EditText editText;
-    Button encryptButton, decryptButton;
+    Button encryptButton, decryptButton, requestKeyPair;
     Cursor cursor;
 
     @Override
@@ -18,22 +18,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editText = (EditText) findViewById(R.id.editText);
-        encryptButton = (Button) findViewById(R.id.buttonEncrypt);
-        decryptButton = (Button) findViewById(R.id.buttonDecrypt);
+        editText = findViewById(R.id.editText);
 
-        encryptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        requestKeyPair = findViewById(R.id.buttonRequestKeyPair);
+        requestKeyPair.setOnClickListener(this);
+
+        encryptButton = findViewById(R.id.buttonEncrypt);
+        encryptButton.setOnClickListener(this);
+
+        decryptButton = findViewById(R.id.buttonDecrypt);
+        decryptButton.setOnClickListener(this);
+
+    }
+
+    public void onClick(View v){
+        switch (v.getId()){
+            case R.id.buttonRequestKeyPair:
+                //request keys returned in cursor
+                break;
+
+            case R.id.buttonEncrypt:
                 //encrypt text
-            }
-        });
+                break;
 
-        decryptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            case R.id.buttonDecrypt:
                 //decrypt text
-            }
-        });
+                break;
+
+            default:
+                break;
+        }
     }
 }
