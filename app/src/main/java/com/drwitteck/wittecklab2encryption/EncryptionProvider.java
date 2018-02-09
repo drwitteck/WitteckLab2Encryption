@@ -3,6 +3,7 @@ package com.drwitteck.wittecklab2encryption;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 
 import java.security.KeyPair;
@@ -49,8 +50,8 @@ public class EncryptionProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        // TODO: Implement this to handle query requests from clients.
         throw new UnsupportedOperationException("Not yet implemented");
+//        MatrixCursor matrixCursor = new MatrixCursor(new String[]{privateKey, publicKey});
     }
 
     @Override
