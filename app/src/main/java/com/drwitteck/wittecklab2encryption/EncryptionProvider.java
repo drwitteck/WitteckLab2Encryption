@@ -6,18 +6,26 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 public class EncryptionProvider extends ContentProvider {
     KeyPairGenerator keyPairGenerator;
     KeyPair keyPair;
     PublicKey publicKey;
     PrivateKey privateKey;
+    Cipher cipherEncrypt, cipherDecrypt;
     String encrypted, decrypted;
+    byte[] encryptedBytes, decryptedBytes;
 
     private final static String METHOD = "RSA";
     private final static int BITS = 1024;
@@ -54,7 +62,7 @@ public class EncryptionProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
         throw new UnsupportedOperationException("Not yet implemented");
-//        MatrixCursor matrixCursor = new MatrixCursor(new String[]{privateKey, publicKey});
+//        MatrixCursor matrixCursor = new MatrixCursor(new String[]{});
     }
 
     @Override
@@ -64,13 +72,28 @@ public class EncryptionProvider extends ContentProvider {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public KeyPair generateKeyPair() throws NoSuchAlgorithmException{
+    public String encrypt(String initial) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         keyPairGenerator = KeyPairGenerator.getInstance(METHOD);
         keyPairGenerator.initialize(BITS);
-//        keyPair = keyPairGenerator.generateKeyPair();
-//        publicKey = keyPair.getPublic();
-//        privateKey = keyPair.getPrivate();
-        return keyPairGenerator.genKeyPair();
+        keyPair = keyPairGenerator.generateKeyPair();
+        publicKey = keyPair.getPublic();
+        privateKey = keyPair.getPrivate();
+
+        cipherEncrypt = Cipher.getInstance(METHOD);
+        cipherEncrypt.init(Cipher.ENCRYPT_MODE, publicKey);
+        encryptedBytes = cipherEncrypt.doFinal(initial.getBytes());
+        encrypted = new String(encryptedBytes);
+
+        return encrypted;
+    }
+
+    public String decrypt(String completed) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        cipherDecrypt = Cipher.getInstance(METHOD);
+        cipherDecrypt.init(Cipher.DECRYPT_MODE, privateKey);
+        decryptedBytes = cipherDecrypt.doFinal(completed.getBytes());
+        decrypted = new String(decryptedBytes);
+
+        return decrypted;
     }
 
 }
