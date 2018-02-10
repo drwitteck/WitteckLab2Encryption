@@ -1,11 +1,13 @@
 package com.drwitteck.wittecklab2encryption;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -18,7 +20,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editText = findViewById(R.id.editText);
+        cursor = getContentResolver().query(Uri.parse("content://com.drwitteck.wittecklab2encryption.encryptionprovider")
+                , null, null, null, null);
+
+        editText = findViewById(R.id.editTextToEncrypt);
 
         requestKeyPair = findViewById(R.id.buttonRequestKeyPair);
         requestKeyPair.setOnClickListener(this);
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.buttonRequestKeyPair:
                 //request keys returned in cursor
+                Toast.makeText(this, "RSA keys have been saved", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.buttonEncrypt:

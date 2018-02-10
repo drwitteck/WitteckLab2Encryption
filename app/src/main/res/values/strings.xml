@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">WitteckLab2Encryption</string>
-    <string name="enter_text">Enter text</string>
+    <string name="enter_text">Enter text to encrypt</string>
     <string name="decrypt">Decrypt</string>
     <string name="encrypt">Encrypt</string>
     <string name="request_key_pair">Request Key Pair</string>
+    <string name="please_enter_text_to_encrypt">Please Enter Text To Encrypt</string>
+    <string name="click_to_request_rsa_keys">Click to request RSA keys</string>
 </resources>

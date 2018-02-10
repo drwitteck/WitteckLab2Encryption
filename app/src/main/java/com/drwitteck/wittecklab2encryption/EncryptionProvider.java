@@ -19,6 +19,9 @@ public class EncryptionProvider extends ContentProvider {
     PrivateKey privateKey;
     String encrypted, decrypted;
 
+    private final static String METHOD = "RSA";
+    private final static int BITS = 1024;
+
     public EncryptionProvider() {
     }
 
@@ -61,12 +64,13 @@ public class EncryptionProvider extends ContentProvider {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public void generateKeyPair() throws NoSuchAlgorithmException{
-        keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048);
-        keyPair = keyPairGenerator.generateKeyPair();
-        publicKey = keyPair.getPublic();
-        privateKey = keyPair.getPrivate();
+    public KeyPair generateKeyPair() throws NoSuchAlgorithmException{
+        keyPairGenerator = KeyPairGenerator.getInstance(METHOD);
+        keyPairGenerator.initialize(BITS);
+//        keyPair = keyPairGenerator.generateKeyPair();
+//        publicKey = keyPair.getPublic();
+//        privateKey = keyPair.getPrivate();
+        return keyPairGenerator.genKeyPair();
     }
 
 }
