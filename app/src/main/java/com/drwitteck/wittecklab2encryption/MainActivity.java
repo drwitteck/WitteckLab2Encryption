@@ -28,10 +28,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .query(Uri.parse("content://com.drwitteck.wittecklab2encryption.encryptionprovider")
                 , null, null, null, null);
 
-//        assert cursor != null;
-//        cursor.moveToNext();
-
-//        Log.d("key", cursor.getString(0));
+        assert cursor != null;
+        cursor.moveToNext();
+        Log.d("key", cursor.getString(0));
 
         editText = findViewById(R.id.editTextToEncrypt);
         userEnteredText = editText.toString();
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v){
         switch (v.getId()){
             case R.id.buttonRequestKeyPair:
-                //request keys returned in cursor
                 try {
                     EncryptionProvider ep = new EncryptionProvider();
                     ep.generateKeyPair();
