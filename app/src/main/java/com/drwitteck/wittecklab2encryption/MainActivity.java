@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText editText;
     Button encryptButton, decryptButton, requestKeyPair;
     Cursor cursor;
-    String userEnteredText;
+    String userEnteredText, publicKeyString, privateKeyString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         assert cursor != null;
         cursor.moveToNext();
-        Log.d("key", cursor.getString(0));
+
+        publicKeyString = cursor.getString(0);
+        privateKeyString = cursor.getString(1);
 
         editText = findViewById(R.id.editTextToEncrypt);
         userEnteredText = editText.toString();
@@ -59,11 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.buttonEncrypt:
-
+                RSA.encrypt(userEnteredText, publicKeyString);
                 break;
 
             case R.id.buttonDecrypt:
-
+                RSA.decrypt(userEnteredText, privateKeyString);
                 break;
 
             default:

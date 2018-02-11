@@ -2,10 +2,12 @@ package com.drwitteck.wittecklab2encryption;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.util.Base64;
+import android.widget.Toast;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -54,7 +56,7 @@ public class EncryptionProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
 
         try {
-            generateKeyPair();
+            keyPair = generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -82,15 +84,15 @@ public class EncryptionProvider extends ContentProvider {
     }
 
     public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
-        keyPair = null;
+        KeyPair kp = null;
         try{
             keyPairGenerator = KeyPairGenerator.getInstance(METHOD);
             keyPairGenerator.initialize(BITS);
-            keyPair = keyPairGenerator.generateKeyPair();
+            kp = keyPairGenerator.generateKeyPair();
         } catch (Exception e){
             e.printStackTrace();
         }
 
-        return keyPair;
+        return kp;
     }
 }
