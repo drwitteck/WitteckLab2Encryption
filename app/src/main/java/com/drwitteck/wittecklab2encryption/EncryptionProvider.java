@@ -5,27 +5,18 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.util.Base64;
 
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
 public class EncryptionProvider extends ContentProvider {
     KeyPairGenerator keyPairGenerator;
     KeyPair keyPair;
-    PublicKey publicKey;
-    PrivateKey privateKey;
-    Cipher cipherEncrypt, cipherDecrypt;
-    String encrypted, decrypted;
-    byte[] encryptedBytes, decryptedBytes;
+    String publicKeyString, privateKeyString;
 
     private final static String METHOD = "RSA";
     private final static int BITS = 1024;
@@ -61,8 +52,26 @@ public class EncryptionProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        throw new UnsupportedOperationException("Not yet implemented");
-//        MatrixCursor matrixCursor = new MatrixCursor(new String[]{});
+
+        try {
+            generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        PublicKey publicKey = keyPair.getPublic();
+        byte[] publicKeyBytes = publicKey.getEncoded();
+        publicKeyString = Base64.encodeToString(publicKeyBytes, Base64.DEFAULT);
+
+        PrivateKey privateKey = keyPair.getPrivate();
+        byte[] privateKeyBytes = privateKey.getEncoded();
+        privateKeyString = Base64.encodeToString(privateKeyBytes, Base64.DEFAULT);
+
+        MatrixCursor matrixCursor = new MatrixCursor(new String[]{"Public", "Private"});
+
+        matrixCursor.addRow(new String[]{publicKeyString, privateKeyString});
+
+        return matrixCursor;
     }
 
     @Override
@@ -72,28 +81,16 @@ public class EncryptionProvider extends ContentProvider {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public String encrypt(String initial) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        keyPairGenerator = KeyPairGenerator.getInstance(METHOD);
-        keyPairGenerator.initialize(BITS);
-        keyPair = keyPairGenerator.generateKeyPair();
-        publicKey = keyPair.getPublic();
-        privateKey = keyPair.getPrivate();
+    public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+        keyPair = null;
+        try{
+            keyPairGenerator = KeyPairGenerator.getInstance(METHOD);
+            keyPairGenerator.initialize(BITS);
+            keyPair = keyPairGenerator.generateKeyPair();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
-        cipherEncrypt = Cipher.getInstance(METHOD);
-        cipherEncrypt.init(Cipher.ENCRYPT_MODE, publicKey);
-        encryptedBytes = cipherEncrypt.doFinal(initial.getBytes());
-        encrypted = new String(encryptedBytes);
-
-        return encrypted;
+        return keyPair;
     }
-
-    public String decrypt(String completed) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        cipherDecrypt = Cipher.getInstance(METHOD);
-        cipherDecrypt.init(Cipher.DECRYPT_MODE, privateKey);
-        decryptedBytes = cipherDecrypt.doFinal(completed.getBytes());
-        decrypted = new String(decryptedBytes);
-
-        return decrypted;
-    }
-
 }
