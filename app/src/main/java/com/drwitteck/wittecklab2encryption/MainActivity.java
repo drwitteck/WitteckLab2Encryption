@@ -59,11 +59,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.buttonEncrypt:
-                RSA.encrypt(userEnteredText, cursor.getString(0));
+
                 break;
 
             case R.id.buttonDecrypt:
-                RSA.decrypt(userEnteredText, cursor.getString(1));
+
                 break;
 
             default:
