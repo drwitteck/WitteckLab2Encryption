@@ -68,7 +68,6 @@ public class EncryptionProvider extends ContentProvider {
         privateKeyString = Base64.encodeToString(privateKeyBytes, Base64.DEFAULT);
 
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{"Public", "Private"});
-
         matrixCursor.addRow(new String[]{publicKeyString, privateKeyString});
 
         return matrixCursor;
