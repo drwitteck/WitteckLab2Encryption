@@ -104,7 +104,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cursor.moveToNext();
         cursor.close();
 
-        //Extract the public key from the cursor, decode the string, then re-encode using X509 standard
+        /*
+        Extract the public key from the cursor, decode the string, then re-encode using X509 standard
+        to pass to encrypt function
+         */
         publicKeyString = cursor.getString(0);
         byte[] publicBytes = Base64.decode(publicKeyString, Base64.DEFAULT);
         /*Implementation of this code was reviewed on StackOverflow*/
@@ -112,7 +115,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         publicKey = keyFactory.generatePublic(keySpec);
 
-        //Extract the private key from the cursor, decode the string, then re-encode using PKCS8 standard
+        /*
+        Extract the private key from the cursor, decode the string, then re-encode using X509 standard
+        to pass to decrypt function
+         */
         privateKeyString = cursor.getString(1);
         byte[] privateBytes = Base64.decode(privateKeyString, Base64.DEFAULT);
         /*Implementation of this code was reviewed on StackOverflow*/
