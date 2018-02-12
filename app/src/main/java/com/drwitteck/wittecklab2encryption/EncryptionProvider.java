@@ -2,12 +2,10 @@ package com.drwitteck.wittecklab2encryption;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.util.Base64;
-import android.widget.Toast;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
