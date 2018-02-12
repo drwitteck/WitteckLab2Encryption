@@ -55,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         decryptButton = findViewById(R.id.buttonDecrypt);
         decryptButton.setOnClickListener(this);
+
+        encryptButton.setEnabled(false);
+        decryptButton.setEnabled(false);
     }
 
     public void onClick(View v){
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
+                encryptButton.setEnabled(true);
                 break;
 
             case R.id.buttonEncrypt:
@@ -79,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         NoSuchAlgorithmException | NoSuchPaddingException | UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
+                requestKeyPair.setEnabled(false);
+                decryptButton.setEnabled(true);
+                encryptButton.setEnabled(false);
                 break;
 
             case R.id.buttonDecrypt:
@@ -88,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         BadPaddingException | NoSuchPaddingException | UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
+                encryptButton.setEnabled(true);
+                requestKeyPair.setEnabled(true);
                 break;
 
             default:
