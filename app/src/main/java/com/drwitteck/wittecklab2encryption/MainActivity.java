@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editText.setText(rsa.bytesToString(bytes));
 
             decryptButton.setEnabled(true);
-            encryptButton.setEnabled(false);
         }
     }
 
