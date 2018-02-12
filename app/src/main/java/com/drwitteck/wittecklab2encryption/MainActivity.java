@@ -136,7 +136,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(TextUtils.isEmpty(editText.getText().toString())){
             editText.setError("Please enter text to encrypt.");
         } else {
-            //Send the user entered text to be converted to bytes. Then send it and the public key
+            /*
+            Send the user entered string to be converted to bytes. Then send it and the public key
+            to the encrypt method.
+             */
             bytes = rsa.encrypt(publicKey, rsa.stringToBytes(editText.getText().toString()));
             editText.setText(rsa.bytesToString(bytes));
 
