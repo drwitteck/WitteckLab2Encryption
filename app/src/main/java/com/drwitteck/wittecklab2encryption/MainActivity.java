@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     PrivateKey privateKey;
     byte[] bytes;
     boolean requested;
+    final String URI = getString(R.string.uri);
+    private final static String METHOD = "RSA";
 
     RSA rsa = new RSA();
 
