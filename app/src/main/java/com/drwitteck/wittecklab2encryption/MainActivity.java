@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void requestKeys() throws InvalidKeySpecException, NoSuchAlgorithmException {
         cursor = getContentResolver()
-                .query(Uri.parse("com.drwitteck.wittecklab2encryption.EncryptionProvider")
+                .query(Uri.parse("content://com.drwitteck.wittecklab2encryption.encryptionprovider")
                         , null, null, null, null);
 
         assert cursor != null;
