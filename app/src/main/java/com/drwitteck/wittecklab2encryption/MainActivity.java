@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
@@ -32,7 +33,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback{
 
     EditText editText;
     Button encryptButton, decryptButton, requestKeyPair;
@@ -43,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     byte[] bytes;
     boolean requested;
     RSA rsa;
-    PendingIntent pi;
 
     final static String METHOD = "RSA";
 
@@ -52,7 +52,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         rsa = new RSA(MainActivity.this);
+        editText = findViewById(R.id.editTextToEncrypt);
+
+        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mAdapter == null) {
+            editText.setText("Sorry this device does not have NFC.");
+            return;
+        }
+
+        if (!mAdapter.isEnabled()) {
+            Toast.makeText(this, "Please enable NFC.", Toast.LENGTH_LONG).show();
+        }
+
+        mAdapter.setNdefPushMessageCallback(this, MainActivity.this);
 
         editText = findViewById(R.id.editTextToEncrypt);
         userEnteredText = editText.getText().toString();
@@ -68,47 +82,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         encryptButton.setEnabled(false);
         decryptButton.setEnabled(false);
-
-        Intent intent = new Intent(MainActivity.this, MainActivity.class);
-        pi = PendingIntent.getActivity(MainActivity.this, 0, intent, 0);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pi, null, null);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        NfcAdapter.getDefaultAdapter(this).disableForegroundDispatch(this);
-    }
-
-    @Override
-    protected  void onNewIntent(Intent intent) {
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-            writePayLoad(intent.<Tag>getParcelableExtra(NfcAdapter.EXTRA_TAG));
-        }
-    }
-
-    private void writePayLoad (Tag tag) {
-        NdefRecord dataRecord = NdefRecord.createTextRecord(null
-                , ((EditText) findViewById(R.id.editTextToEncrypt)).getText().toString());
-
-        NdefRecord appRecord = NdefRecord.createApplicationRecord(getPackageName());
-
-        NdefMessage message = new NdefMessage(new NdefRecord[]{dataRecord, appRecord});
-
-        // Preempt exceptions by checking for problems
-        // such as sufficient space, formatted, etc.
-        try {
-            Ndef ndef = Ndef.get(tag);
-            ndef.connect();
-            ndef.writeNdefMessage(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void onClick(View v){
@@ -217,5 +190,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         decryptButton.setEnabled(false);
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+        String message = editText.getText().toString();
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
+
+        return new NdefMessage(ndefRecord);
     }
 }
