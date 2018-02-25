@@ -1,15 +1,11 @@
 package com.drwitteck.wittecklab2encryption;
 
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -33,7 +29,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
 
     EditText editText;
     Button encryptButton, decryptButton, requestKeyPair;
@@ -53,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rsa = new RSA(MainActivity.this);
         editText = findViewById(R.id.editTextToEncrypt);
 
         NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -67,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         mAdapter.setNdefPushMessageCallback(this, MainActivity.this);
+
+
+        rsa = new RSA(MainActivity.this);
 
         editText = findViewById(R.id.editTextToEncrypt);
         userEnteredText = editText.getText().toString();
@@ -83,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         encryptButton.setEnabled(false);
         decryptButton.setEnabled(false);
     }
+
 
     public void onClick(View v){
         switch (v.getId()){
@@ -196,7 +195,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
         String message = editText.getText().toString();
         NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
+        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
 
-        return new NdefMessage(ndefRecord);
+        return ndefMessage;
     }
 }
