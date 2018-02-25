@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.drwitteck.wittecklab2encryption">
 
-    <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.NFC" />
 
     <application
         android:allowBackup="true"
@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +25,11 @@
             android:authorities="com.drwitteck.wittecklab2encryption.encryptionprovider"
             android:enabled="true"
             android:exported="false" />
+
+        <activity android:name=".ReadActivity"
+            android:launchMode="singleTop">
+
+        </activity>
     </application>
 
 </manifest>

@@ -1,5 +1,7 @@
 package com.drwitteck.wittecklab2encryption;
 
+import android.content.Context;
+
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +15,10 @@ import javax.crypto.NoSuchPaddingException;
 
 public class RSA {
     private final static String METHOD = "RSA";
+
+    public RSA(Context context) {
+
+    }
 
     /*Referenced from StackOverflow*/
     public byte[] encrypt(PublicKey key, byte[] text) throws NoSuchAlgorithmException, NoSuchPaddingException,

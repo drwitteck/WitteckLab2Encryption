@@ -1,7 +1,14 @@
 package com.drwitteck.wittecklab2encryption;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -35,15 +42,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     PrivateKey privateKey;
     byte[] bytes;
     boolean requested;
-    final String URI = getString(R.string.uri);
-    private final static String METHOD = "RSA";
+    RSA rsa;
+    PendingIntent pi;
 
-    RSA rsa = new RSA();
+    final static String METHOD = "RSA";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        rsa = new RSA(MainActivity.this);
 
         editText = findViewById(R.id.editTextToEncrypt);
         userEnteredText = editText.getText().toString();
@@ -59,6 +68,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         encryptButton.setEnabled(false);
         decryptButton.setEnabled(false);
+
+        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+        pi = PendingIntent.getActivity(MainActivity.this, 0, intent, 0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pi, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        NfcAdapter.getDefaultAdapter(this).disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected  void onNewIntent(Intent intent) {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            writePayLoad(intent.<Tag>getParcelableExtra(NfcAdapter.EXTRA_TAG));
+        }
+    }
+
+    private void writePayLoad (Tag tag) {
+        NdefRecord dataRecord = NdefRecord.createTextRecord(null
+                , ((EditText) findViewById(R.id.editTextToEncrypt)).getText().toString());
+
+        NdefRecord appRecord = NdefRecord.createApplicationRecord(getPackageName());
+
+        NdefMessage message = new NdefMessage(new NdefRecord[]{dataRecord, appRecord});
+
+        // Preempt exceptions by checking for problems
+        // such as sufficient space, formatted, etc.
+        try {
+            Ndef ndef = Ndef.get(tag);
+            ndef.connect();
+            ndef.writeNdefMessage(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void onClick(View v){
@@ -107,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void requestKeys() throws InvalidKeySpecException, NoSuchAlgorithmException {
         cursor = getContentResolver()
-                .query(Uri.parse(URI)
+                .query(Uri.parse("com.drwitteck.wittecklab2encryption.EncryptionProvider")
                         , null, null, null, null);
 
         assert cursor != null;
