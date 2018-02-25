@@ -38,13 +38,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,
-        NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback{
-
-    NfcAdapter nfcAdapter;
-    TextView textToSend;
-    private static final int MESSAGE_SENT = 1;
-
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
 
     EditText editText;
     Button encryptButton, decryptButton, requestKeyPair;
@@ -65,13 +59,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         editText = findViewById(R.id.editTextToEncrypt);
-        nfcAdapter = NfcAdapter.getDefaultAdapter(MainActivity.this);
-        if (nfcAdapter == null) {
-            Toast.makeText(this, "NFC not available on this device.", Toast.LENGTH_SHORT).show();
-        } else {
-            nfcAdapter.setNdefPushMessageCallback(this, MainActivity.this);
-            nfcAdapter.setOnNdefPushCompleteCallback(this, MainActivity.this);
+
+        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mAdapter == null) {
+            editText.setText("Sorry this device does not have NFC.");
+            return;
         }
+
+        if (!mAdapter.isEnabled()) {
+            Toast.makeText(this, "Please enable NFC via Settings.", Toast.LENGTH_LONG).show();
+        }
+
+        mAdapter.setNdefPushMessageCallback(this, MainActivity.this);
 
 
         rsa = new RSA(MainActivity.this);
@@ -203,54 +202,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-        String text = editText.getText().toString();
-        NdefMessage message = new NdefMessage(NdefRecord.createMime("text/plain", text.getBytes()));
+        String message = editText.getText().toString();
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
+        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
 
-        return message;
-    }
-
-    @Override
-    public void onNdefPushComplete(NfcEvent arg0) {
-        // A handler is needed to send messages to the activity when this
-        // callback occurs, because it happens from a binder thread
-        mHandler.obtainMessage(MESSAGE_SENT).sendToTarget();
-    }
-
-
-    @SuppressLint("HandlerLeak")
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_SENT:
-                    Toast.makeText(getApplicationContext(), "Message sent!", Toast.LENGTH_LONG).show();
-                    break;
-            }
-        }
-    };
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Check to see that the Activity started due to an Android Beam
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            processIntent(getIntent());
-        }
-    }
-    @Override
-    public void onNewIntent(Intent intent) {
-        // onResume gets called after this to handle the intent
-        setIntent(intent);
-    }
-    /**
-     * Parses the NDEF Message from the intent and prints to the TextView
-     */
-    void processIntent(Intent intent) {
-        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
-                NfcAdapter.EXTRA_NDEF_MESSAGES);
-        // only one message sent during the beam
-        NdefMessage msg = (NdefMessage) rawMsgs[0];
-        // record 0 contains the MIME type, record 1 is the AAR, if present
-        textToSend.setText(new String(msg.getRecords()[0].getPayload()));
+        return ndefMessage;
     }
 }
