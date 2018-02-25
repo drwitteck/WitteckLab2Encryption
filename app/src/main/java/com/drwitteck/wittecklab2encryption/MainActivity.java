@@ -1,27 +1,18 @@
 package com.drwitteck.wittecklab2encryption;
 
-import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
@@ -67,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (!mAdapter.isEnabled()) {
-            Toast.makeText(this, "Please enable NFC via Settings.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please enable NFC.", Toast.LENGTH_LONG).show();
         }
 
         mAdapter.setNdefPushMessageCallback(this, MainActivity.this);
