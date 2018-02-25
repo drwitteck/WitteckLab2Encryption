@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     PrivateKey privateKey;
     byte[] bytes;
     boolean requested;
-    final String URI = getString(R.string.uri);
+
     private final static String METHOD = "RSA";
 
     RSA rsa = new RSA();
@@ -49,13 +49,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         userEnteredText = editText.getText().toString();
 
         requestKeyPair = findViewById(R.id.buttonRequestKeyPair);
-        requestKeyPair.setOnClickListener(this);
+        requestKeyPair.setOnClickListener(MainActivity.this);
 
         encryptButton = findViewById(R.id.buttonEncrypt);
-        encryptButton.setOnClickListener(this);
+        encryptButton.setOnClickListener(MainActivity.this);
 
         decryptButton = findViewById(R.id.buttonDecrypt);
-        decryptButton.setOnClickListener(this);
+        decryptButton.setOnClickListener(MainActivity.this);
 
         encryptButton.setEnabled(false);
         decryptButton.setEnabled(false);
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void requestKeys() throws InvalidKeySpecException, NoSuchAlgorithmException {
         cursor = getContentResolver()
-                .query(Uri.parse(URI)
+                .query(Uri.parse("content://com.drwitteck.wittecklab2encryption.encryptionprovider")
                         , null, null, null, null);
 
         assert cursor != null;
