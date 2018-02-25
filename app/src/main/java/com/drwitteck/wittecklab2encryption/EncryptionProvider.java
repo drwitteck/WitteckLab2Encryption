@@ -5,7 +5,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.util.Base64;
+import android.widget.TextView;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
