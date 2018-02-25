@@ -2,11 +2,10 @@ package com.drwitteck.wittecklab2encryption;
 
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void requestKeys() throws InvalidKeySpecException, NoSuchAlgorithmException {
         cursor = getContentResolver()
-                .query(Uri.parse("content://com.drwitteck.wittecklab2encryption.encryptionprovider")
+                .query(Uri.parse(URI)
                         , null, null, null, null);
 
         assert cursor != null;
@@ -123,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         byte[] publicBytes = Base64.decode(publicKeyString, Base64.DEFAULT);
         /*Implementation of this code was reviewed on StackOverflow*/
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance(METHOD);
         publicKey = keyFactory.generatePublic(keySpec);
 
         /*
@@ -134,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         byte[] privateBytes = Base64.decode(privateKeyString, Base64.DEFAULT);
         /*Implementation of this code was reviewed on StackOverflow*/
         PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(privateBytes);
-        KeyFactory keyFactoryPrivate = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactoryPrivate = KeyFactory.getInstance(METHOD);
         privateKey = keyFactoryPrivate.generatePrivate(keySpecPrivate);
 
         decryptButton.setEnabled(false);
