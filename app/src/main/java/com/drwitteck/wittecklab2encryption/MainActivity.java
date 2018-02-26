@@ -15,6 +15,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.spongycastle.openssl.jcajce.JcaPEMWriter;
+
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -148,6 +152,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         publicKey = keyFactory.generatePublic(keySpec);
 
         /*
+        Convert RSA public key to PEM string
+         */
+        try {
+            String publicPEM = getPEMPublicStringFromRSAKeyPair(publicKey);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*
         Extract the private key from the cursor, decode the string, then re-encode using X509 standard
         to pass to decrypt function
          */
@@ -162,6 +175,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Toast.makeText(this, "Keys requested and saved.", Toast.LENGTH_SHORT).show();
     }
+
+    private String getPEMPublicStringFromRSAKeyPair(PublicKey publicKey) throws IOException {
+        final StringWriter pemStrWriter = new StringWriter();
+        final JcaPEMWriter pemWriter = new JcaPEMWriter(pemStrWriter);
+        pemWriter.writeObject(publicKey);
+        pemWriter.close();
+
+        return pemStrWriter.toString();
+    }
+
 
     public void encryptText() throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException,
             NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException {
