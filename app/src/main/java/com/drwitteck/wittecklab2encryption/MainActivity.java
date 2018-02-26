@@ -1,12 +1,16 @@
 package com.drwitteck.wittecklab2encryption;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
+import android.nfc.tech.Ndef;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -20,6 +24,7 @@ import org.spongycastle.openssl.jcajce.JcaPEMWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -28,22 +33,25 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback {
 
     EditText editText;
     Button encryptButton, decryptButton, requestKeyPair;
-    String userEnteredText, publicKeyString, privateKeyString;
+    String userEnteredText, publicKeyString, privateKeyString, publicPEM;
     Cursor cursor;
     PublicKey publicKey;
     PrivateKey privateKey;
     byte[] bytes;
     boolean requested;
     RSA rsa;
+    PendingIntent pi;
 
     final static String METHOD = "RSA";
 
@@ -54,18 +62,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         editText = findViewById(R.id.editTextToEncrypt);
+        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+        pi = PendingIntent.getActivity(MainActivity.this, 0, intent, 0);
 
-        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mAdapter == null) {
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter == null) {
             editText.setText("Sorry this device does not have NFC.");
             return;
         }
 
-        if (!mAdapter.isEnabled()) {
+        if (!nfcAdapter.isEnabled()) {
             Toast.makeText(this, "Please enable NFC.", Toast.LENGTH_LONG).show();
         }
 
-        mAdapter.setNdefPushMessageCallback(this, MainActivity.this);
+        nfcAdapter.setNdefPushMessageCallback(this, MainActivity.this);
 
 
         rsa = new RSA(MainActivity.this);
@@ -155,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Convert RSA public key to PEM string
          */
         try {
-            String publicPEM = getPEMPublicStringFromRSAKeyPair(publicKey);
+            publicPEM = getPEMPublicStringFromRSAKeyPair(publicKey);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -177,14 +187,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private String getPEMPublicStringFromRSAKeyPair(PublicKey publicKey) throws IOException {
-        final StringWriter pemStrWriter = new StringWriter();
-        final JcaPEMWriter pemWriter = new JcaPEMWriter(pemStrWriter);
+        final StringWriter stringWriter = new StringWriter();
+        final JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter);
         pemWriter.writeObject(publicKey);
         pemWriter.close();
 
-        return pemStrWriter.toString();
+        return stringWriter.toString();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pi, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        NfcAdapter.getDefaultAdapter(this).disableForegroundDispatch(this);
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+        String message = editText.getText().toString();
+        String message2 = publicPEM;
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
+        NdefRecord ndefRecord1 = NdefRecord.createMime("text/plain", message2.getBytes());
+        NdefMessage ndefMessage = new NdefMessage(ndefRecord, ndefRecord1);
+
+        return ndefMessage;
+    }
+
+//    @Override
+//    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+//        String userEnteredMessage = editText.getText().toString();
+//        NdefMessage message = new NdefMessage(
+//                NdefRecord.createMime("text/plain", userEnteredMessage.getBytes()),
+//                NdefRecord.createMime("text/plain", publicPEM.getBytes()));
+//
+//        return message;
+//    }
+
+
+    @Override
+    public void onNdefPushComplete(NfcEvent nfcEvent) {
+
+    }
 
     public void encryptText() throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException,
             NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException {
@@ -214,12 +262,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         decryptButton.setEnabled(false);
     }
 
-    @Override
-    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-        String message = editText.getText().toString();
-        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
-        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
 
-        return ndefMessage;
-    }
 }

@@ -13,12 +13,14 @@ import android.widget.TextView;
 public class ReadActivity extends AppCompatActivity {
 
     private TextView textView;
+    //private TextView textView2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
         textView = findViewById(R.id.text_view);
+        //textView2 = findViewById(R.id.text_view2);
     }
 
     @Override
@@ -30,7 +32,9 @@ public class ReadActivity extends AppCompatActivity {
                     NfcAdapter.EXTRA_NDEF_MESSAGES);
 
             NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
+            //NdefMessage message1 = (NdefMessage) rawMessages[1];
             textView.setText(new String(message.getRecords()[0].getPayload()));
+            //textView2.setText(new String(message1.getRecords()[1].getPayload()));
 
         } else
             textView.setText("Waiting for NDEF Message");
