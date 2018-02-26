@@ -186,6 +186,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toast.makeText(this, "Keys requested and saved.", Toast.LENGTH_SHORT).show();
     }
 
+    /*
+    Code referenced from: https://www.programcreek.com/java-api-examples/?code=rovemonteux/
+    silvertunnel-monteux/silvertunnel-monteux-master/src/main/java/cf/monteux/silvertunnel/netlib/layer/tor/util/Encryption.java
+    */
     private String getPEMPublicStringFromRSAKeyPair(PublicKey publicKey) throws IOException {
         final StringWriter stringWriter = new StringWriter();
         final JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter);
@@ -193,6 +197,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pemWriter.close();
 
         return stringWriter.toString();
+    }
+
+    public String convertPEMKeyBackToPublicKey(String pemString) {
+        String keyString = pemString.replace("-----BEGIN PUBLIC KEY-----\n","");
+        keyString = keyString.replace("-----END PUBLIC KEY-----\n","");
+
+        return keyString;
     }
 
     @Override
@@ -210,24 +221,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
         String message = editText.getText().toString();
-        String message2 = publicPEM;
         NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
-        NdefRecord ndefRecord1 = NdefRecord.createMime("text/plain", message2.getBytes());
+        NdefRecord ndefRecord1 = NdefRecord.createMime("text/plain", publicPEM.getBytes());
         NdefMessage ndefMessage = new NdefMessage(ndefRecord, ndefRecord1);
 
         return ndefMessage;
     }
-
-//    @Override
-//    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-//        String userEnteredMessage = editText.getText().toString();
-//        NdefMessage message = new NdefMessage(
-//                NdefRecord.createMime("text/plain", userEnteredMessage.getBytes()),
-//                NdefRecord.createMime("text/plain", publicPEM.getBytes()));
-//
-//        return message;
-//    }
-
 
     @Override
     public void onNdefPushComplete(NfcEvent nfcEvent) {
