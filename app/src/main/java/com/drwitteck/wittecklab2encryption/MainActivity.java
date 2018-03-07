@@ -29,7 +29,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener { //, NfcAdapter.CreateNdefMessageCallback
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
 
     EditText editText;
     Button encryptButton, decryptButton, requestKeyPair;
@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     RSA rsa;
 
     private final static String METHOD = "RSA";
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +48,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         editText = findViewById(R.id.editTextToEncrypt);
 
-//        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
-//        if (mAdapter == null) {
-//            editText.setText("Sorry this device does not have NFC.");
-//            return;
-//        }
-//
-//        if (!mAdapter.isEnabled()) {
-//            Toast.makeText(this, "Please enable NFC.", Toast.LENGTH_LONG).show();
-//        }
-//
-//        mAdapter.setNdefPushMessageCallback(this, MainActivity.this);
+        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mAdapter == null) {
+            editText.setText("Sorry this device does not have NFC.");
+            return;
+        }
+
+        if (!mAdapter.isEnabled()) {
+            Toast.makeText(this, "Please enable NFC.", Toast.LENGTH_LONG).show();
+        }
+
+        mAdapter.setNdefPushMessageCallback(this, MainActivity.this);
 
         editText = findViewById(R.id.editTextToEncrypt);
         userEnteredText = editText.getText().toString();
@@ -138,12 +136,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-//    @Override
-//    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-//        String message = editText.getText().toString();
-//        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
-//        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
-//
-//        return ndefMessage;
-//    }
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+        String message = editText.getText().toString();
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
+        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
+
+        return ndefMessage;
+    }
 }
